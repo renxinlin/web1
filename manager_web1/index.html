@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<title>社交管理系统</title>
+		<link rel="shortcut icon" href="favicon.ico" />
+		<link rel="stylesheet" href="layui/css/layui.css">
+		<link rel="stylesheet" href="css/index.css" />
+		<script language="javascript">
+			// parent是在父窗体打开，self是在当前页面打开，top是在当前窗体打开并覆盖全部
+			// js 防钓鱼嵌网页
+			if(self != top) {
+				top.location.href = self.location.href;
+			}
+
+		</script>
+	</head>
+
+	<body class="layui-layout-body">
+		<div class="layui-layout layui-layout-admin">
+			<!--
+            	作者：offline
+            	时间：2018-09-25
+            	描述：头部区域
+            -->
+			<div class="layui-header">
+				<!--
+					默认一个用户有一个角色
+					多个角色的话选择最主要的角色
+				-->
+
+				<div class="layui-logo">宁波大学管理员</div>
+				<!-- 头部区域（可配合layui已有的水平导航） -->
+				<ul class="layui-nav layui-layout-left">
+
+					<li class="layui-nav-item">
+						<a href="javascript:;">控制台</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a href="">sso用户管理系统</a>
+							</dd>
+							<dd>
+								<a href="">sso监控系统</a>
+							</dd>
+							<dd>
+								<a href="">api接口管理系统</a>
+							</dd>
+						</dl>
+					</li>
+				</ul>
+				<ul class="layui-nav layui-layout-right">
+					<li class="layui-nav-item">
+						<a href="javascript:;">
+							<img src="http://t.cn/RCzsdCq" class="layui-nav-img">小新
+						</a>
+						<dl class="layui-nav-child">
+							<dd>
+								<a href="">基本资料</a>
+							</dd>
+							<dd>
+								<a href="">安全设置</a>
+							</dd>
+						</dl>
+					</li>
+					<li class="layui-nav-item">
+						<a href="">退出登录</a>
+					</li>
+				</ul>
+			</div>
+
+			<!--
+                	作者：offline
+                	时间：2018-09-25
+                	描述：左侧导航栏
+                -->
+			<div class="layui-side layui-bg-black">
+				<div class="layui-side-scroll" id="menu-menu">
+					<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+					<!-- 根据登录用户加载菜单 -->
+
+				</div>
+			</div>
+
+			<div class="layui-body">
+				<!-- 内容主体区域 -->
+				<div id="index-content" style="padding: 15px;">欢迎使用！</div>
+				
+			</div>
+
+			<div class="layui-footer text-center">
+				<!-- 底部固定区域 -->
+				<a href="http://www.renxl.club">青优嘎
+					<a/> |浙ICP备18015349号-1
+			</div>
+		</div>
+
+		<!--脚本区域-->
+		<script src="layui/layui.js"></script>
+		<script src="js/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="js/base-utils.js"></script>
+		<script type="text/javascript" src="js/jquery.tmpl.js"></script>
+		<script type="text/javascript" src="js/index-style.js"></script>
+		<script type="text/javascript" src="js/global.js"></script>
+	</body>
+
+	<script type="application/javascript">
+		layui.use(['element', 'layer'], function() {
+			var element = layui.element;
+			var layer = layui.layer;
+			// 菜单加载
+			$(function() {
+				var url = baseUrl + 'permission/menu';
+				data = AjaxUtil.ajaxGetDefault(url, null, false);
+				// 后台服务彻底崩溃
+				if(data == null) {
+					// 跳转到404或其他处理方式
+					layer.alert("获取菜单失败...");
+					return;
+				}
+				if(data.code == 200) {
+					$("#menu-menu").html("");
+					$('#dataItemTmpl').tmpl({
+						menuData: data.data
+					}).appendTo("#menu-menu");
+					var element = layui.element;
+
+				} else {
+					layer.alert("获取菜单失败...");
+				}
+			});
+		});
+	</script>
+
+	<script id="dataItemTmpl" type="text/x-jquery-tmpl">
+		<ul class="layui-nav layui-nav-tree" lay-filter="test">
+			{{each(i,itemData) menuData}}
+			<li class="layui-nav-item layui-nav-itemed" id="layui-nav-id${i}">
+				<a class="" href="javascript:;" onclick="toggleClassOperation('layui-nav-id${i}')">{{= itemData.name}}</a>
+				<!--				<span class="layui-nav-more"></span>
+-->
+				<dl class="layui-nav-child">
+					{{each(i,sonData) itemData.children}}
+					<dd>
+						<a href="javascript:news_path('${sonData.path}');">${sonData.name}</a>
+					</dd>
+					{{/each}}
+				</dl>
+			</li>
+			{{/each}}
+		</ul>
+	</script>
+
+</html>

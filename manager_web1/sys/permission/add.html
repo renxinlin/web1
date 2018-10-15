@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>新增权限</title>
+		<link rel="stylesheet" href="../../layui/css/layui.css" />
+		<script type="text/javascript" src="../../js/globalscu.js" ></script>
+		<script type="text/javascript">
+			secutity();
+		</script>
+	</head>
+
+	<body>
+   	 <input type="text"   id="permission-look-iframe-data" style="display:none"> 
+
+		<div id="permission-look">
+
+			<form class="layui-form" id="form-permission-add">
+
+				 
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">编码</label>
+					<div class="layui-input-block">
+						<input type="text" id ="permission-look-code"   name="code" lay-verify="required" placeholder="编码" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">名称</label>
+					<div class="layui-input-block">
+						<input type="text"  id ="permission-look-name" name="name" lay-verify="required" placeholder="名称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">类型</label>
+					<div class="layui-input-block">
+						<input type="text" id ="permission-look-type"   name="type" lay-verify="required" placeholder="菜单/按钮/资源" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">资源路径</label>
+					<div class="layui-input-block">
+						<input type="text" id ="permission-look-path" name="path" lay-verify="required" placeholder="资源路径" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">父级资源</label>
+					<div class="layui-input-block">
+						<input type="text" id ="permission-look-pid"    name="pid" lay-verify="required" placeholder="父级资源" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">状态</label>
+					<div class="layui-input-block">
+						<input type="text" id ="permission-look-status" name="status" lay-verify="required" placeholder="状态" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">排序</label>
+					<div class="layui-input-block">
+						<input type="text" id ="permission-look-seq" name="seq" lay-verify="required" placeholder="排序" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">描述</label>
+					<div class="layui-input-block">
+						<textarea id ="permission-look-description" name = "description" placeholder="描述" lay-verify="required" class="layui-textarea"></textarea> </div>
+				</div>
+
+				<div class="layui-form-item">
+					<div class="layui-input-block">
+						<button class="layui-btn" lay-submit="submit()" lay-filter="permission-add">确认</button>
+						<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script type="text/javascript" src="../../js/base-utils.js"></script>
+	<script type="text/javascript" src="../../js/global.js"></script>
+	<script type="text/javascript" src="../../js/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery.tmpl.js"></script>
+	<script type="text/javascript" src="../../layui/layui.js"></script>
+	<script>
+		
+		layui.use(['form','layer', 'layedit', 'laydate'], function() {
+				var form = layui.form,
+					layer = layui.layer,
+					layedit = layui.layedit,
+					laydate = layui.laydate;
+
+			 
+				//监听提交
+				form.on('submit(permission-add)', function(data) {
+					console.log(JSON.stringify(data.field));
+					data = AjaxUtil.ajaxPostDefault(baseUrl+"permission/add", data.field, true);
+				    if(data.code == "200") {
+						layer.msg(data.message);	 
+						$('#form-permission-add')[0].reset();
+					}else{
+						//示范一个公告层
+				       	layer.msg(data.message);	 
+
+					}
+					return false;
+				});
+
+			 
+
+			});
+		
+	</script>
+
+</html>

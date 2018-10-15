@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>用户管理</title>
+		<link rel="stylesheet" href="../layui/css/layui.css" media="all">
+		<script type="text/javascript" src="../js/globalscu.js" ></script>
+		<script type="text/javascript">
+			secutity();
+		</script>
+	</head>
+
+	<body>
+
+		<table class="layui-hide" id="test" lay-filter="test"></table>
+
+		<script type="text/html" id="toolbarDemo">
+			<div class="layui-btn-container">
+				<button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+				<button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+				<button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
+			</div>
+		</script>
+		<script type="text/html" id="barDemo">
+			<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+			<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+		</script>
+
+		<script src="../layui/layui.js"></script>
+		<script type="text/javascript" src="../js/index-style.js"></script>
+		<script type="text/javascript" src="../js/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="../js/base-utils.js"></script>
+		<script type="text/javascript" src="../js/jquery.tmpl.js"></script>
+		<script>
+			layui.use('table', function() {
+				var table = layui.table;
+
+				table.render({
+					elem: '#test',
+					url: '/test/table/demo1.json',
+					toolbar: '#toolbarDemo',
+					title: '用户数据表',
+					totalRow: true,
+					cols: [
+						[{
+							type: 'checkbox',
+							fixed: 'left'
+						}, {
+							field: 'id',
+							title: 'ID',
+							width: 80,
+							fixed: 'left',
+							unresize: true,
+							sort: true,
+							totalRowText: '合计'
+						}, {
+							field: 'username',
+							title: '登录名',
+							width: 120,
+							edit: 'text'
+						}, {
+							field: 'realName',
+							title: '姓名',
+							width: 150,
+							edit: 'text',
+							templet: function(res) {
+								return '<em>' + res.email + '</em>'
+							}
+						}, {
+							field: 'userPhone',
+							title: '手机号',
+							sort: true,
+							totalRow: true
+						}, {
+							field: 'schoolName',
+							title: '学校名称',
+							edit: 'text',
+							sort: true
+						}, {
+							field: 'schoolId',
+							title: '学校编码',
+							width: 100,
+							sort: true,
+							totalRow: true
+						}, {
+							field: 'province',
+							title: '学校省区'
+						}, {
+							field: 'provincesId',
+							title: '学校省区编码',
+						}, {
+							field: 'status',
+							title: '用户状态',
+							width: 120
+						}, {
+							fixed: 'right',
+							title: '操作',
+							toolbar: '#barDemo',
+							width: 150
+						}]
+					],
+					page: true
+				});
+
+				//工具栏事件
+				table.on('toolbar(test)', function(obj) {
+					var checkStatus = table.checkStatus(obj.config.id);
+					switch(obj.event) {
+						case 'getCheckData':
+							var data = checkStatus.data;
+							layer.alert(JSON.stringify(data));
+							break;
+						case 'getCheckLength':
+							var data = checkStatus.data;
+							layer.msg('选中了：' + data.length + ' 个');
+							break;
+						case 'isAll':
+							layer.msg(checkStatus.isAll ? '全选' : '未全选')
+							break;
+					};
+				});
+			});
+		</script>
+
+	</body>
+
+</html>

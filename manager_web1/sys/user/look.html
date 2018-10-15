@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>角色查询(修改)页面</title>
+		<link rel="stylesheet" href="../../layui/css/layui.css" />
+		<script type="text/javascript" src="../../js/globalscu.js"></script>
+		<script type="text/javascript">
+			secutity();
+		</script>
+	</head>
+
+	<body>
+		<input type="text" id="permission-look-iframe-data" style="display:none">
+
+		<div id="permission-look">
+
+			<form class="layui-form">
+
+				<div class="layui-form-item">
+					<label class="layui-form-label">ID</label>
+					<div class="layui-input-inline">
+						<input type="text" disabled="disabled" id="permission-look-id" style="color: red;" name="id" lay-verify="required" placeholder="ID" autocomplete="off" class="layui-input">
+					</div>
+					<label class="layui-form-label">登录名</label>
+					<div class="layui-input-inline">
+						<input type="text" id="permission-look-username" name="username" disabled="disabled" style="color: red;" lay-verify="required" placeholder="名称" autocomplete="off" class="layui-input">
+					</div>
+
+					<label class="layui-form-label">真实姓名</label>
+					<div class="layui-input-inline">
+						<input type="text" id="permission-look-nickName" name="nickName" disabled="disabled" style="color: red;" lay-verify="required" placeholder="名称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<!-- 学校信息 -->
+				<div class="layui-form-item">
+
+					<label class="layui-form-label">手机号</label>
+					<div class="layui-input-inline">
+						<input type="text" id="permission-look-userPhone" name="userPhone" lay-verify="required" placeholder="手机号" autocomplete="off" class="layui-input">
+					</div>
+
+					<label class="layui-form-label">学校名称</label>
+					<div class="layui-input-inline">
+						<select id="selectSchool" name="schoolId" lay-filter="schoolChoose" lay-search>
+							<option>请选择</option>
+
+						</select>
+					</div>
+
+					<label class="layui-form-label">学校省区</label>
+					<div class="layui-input-inline">
+						<select id="selectArea" name="schoolProvinceCode" lay-filter="areaChoose" lay-search>
+							<option>请选择</option>
+							<!--加上这一行，先占个坑-->
+						</select>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+
+					<label class="layui-form-label">状态</label>
+					<div class="layui-input-inline">
+						<input type="text" id="permission-look-status" name="status" lay-verify="required" placeholder="0启用，1禁用" autocomplete="off" class="layui-input">
+					</div>
+					<div class="layui-btn-group">
+						<button id="role-btn-update" class="layui-btn layui-bg-blue" lay-submit="submit()" lay-filter="role-permission-update" data-type="rolePermissionUpdate">修改</button>
+
+						<button  class="layui-btn " >刷新</button>
+					</div>
+				</div>
+
+			</form>
+
+			<hr class="layui-bg-blue" />
+			<table class="layui-hide" id="test" lay-filter="permissionOfRole"></table>
+
+		</div>
+	</body>
+	<script type="text/javascript" src="../../js/base-utils.js"></script>
+	<script type="text/javascript" src="../../js/global.js"></script>
+	<script type="text/javascript" src="../../js/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="../../js/jquery.tmpl.js"></script>
+	<script type="text/javascript" src="../../layui/layui.js"></script>
+	<script>
+		layui.use(['layedit', 'form', 'table', 'layer'], function() {
+
+			$ = layui.jquery;
+			var layer = layui.layer;
+			var table = layui.table;
+			var form = layui.form;
+
+			//
+			var formdata = [];
+			active = {
+				rolePermissionUpdate: function() { //获取选中数据
+					
+					var checkStatus = table.checkStatus('test');
+					data = checkStatus.data;
+					var id = "";
+					for(var i = 0; i < data.length; i++) {
+						formdata[i] = {
+							roleId: data[i].id
+						};
+					}
+				},
+				
+			};
+			//监听提交
+			form.on('submit(role-permission-update)', function(data) {
+
+				if(data.field == null || data.field == '' || typeof(data.field) == "undefined") {
+					layer.msg("参数丢失...");
+					return
+				}
+				if(data.field.username == null || data.field.username == '') {
+					layer.msg("请填写角色名称...");
+					return
+				}
+				if(data.field.id == null || data.field.id == '') {
+					layer.msg("角色Id丢失...");
+					return
+				}
+				var schoolProvince = $("#selectArea").find("option:selected").text();
+				var schoolName = $("#selectSchool").find("option:selected").text();
+				status = true;
+				if(data.field.status == 1 || data.field.status =='禁用') {
+					status = false;
+				}else{
+					status = true;
+
+				}
+
+				data = {
+					username: data.field.username,
+					id: data.field.id,
+					nickName: data.field.nickName,
+					userPhone: data.field.userPhone,
+					schoolId: data.field.schoolId,
+					schoolName: schoolName,
+					schoolProvinceCode: data.field.schoolProvinceCode,
+					schoolProvince: schoolProvince,
+					status: status,
+					password: data.field.password,
+					userRoles: formdata
+				};
+				data = AjaxUtil.ajaxPostDefault(baseUrl + "userManager/update", data, true);
+				if(data == null) {
+					layer.msg("后台消失啦...");
+					return
+				}
+				if(data.code == "200") {
+					layer.msg(data.message);
+				} else {
+					//示范一个公告层
+					layer.msg(data.message);
+
+				}
+				return false;
+			});
+
+			//
+
+			$('#role-btn-update').on('click', function() {
+				var type = $(this).data('type');
+				active[type] ? active[type].call(this) : '';
+			});
+
+		});
+		/**
+		 * 来自父亲的数据发送
+		 * @param {Object} data
+		 */
+		function sendData(data) {
+			$("#permission-look-iframe-data").val(data);
+			layui.use(['layedit', 'form', 'table', 'layer'], function() {
+				$ = layui.jquery;
+				var layer = layui.layer;
+				var table = layui.table;
+				var form = layui.form;
+				// 加载数据
+				$(function() {
+
+					//渲染select数据 开始
+					dataArea = AjaxUtil.ajaxPostDefault(baseUrl + "area/look-all", null, true);
+					if(dataArea != null) {
+						if(dataArea.code == 200) {
+							$("#selectAreaTmpl").tmpl({
+								areaData: dataArea.data
+							}).appendTo("#selectArea");
+						}
+					}
+					dataSchool = AjaxUtil.ajaxPostDefault(baseUrl + "college/look-all", null, true);
+					if(dataSchool != null) {
+						if(dataSchool.code == 200) {
+							$("#selectSchoolTmpl").tmpl({
+								schoolData: dataSchool.data
+							}).appendTo("#selectSchool");
+						}
+					}
+					form.render('select');
+
+					/////////////////////////
+					var data = {
+						id: $("#permission-look-iframe-data").val()
+					}
+					data = AjaxUtil.ajaxPostDefault(baseUrl + "userManager/look", data, true);
+					if(data == null) {
+						layer.msg('后台消失了...');
+					}
+					if(data.code == 200) {
+						layer.msg('小主需要的信息来了...');
+						$("#permission-look-id").val(data.data.id);
+						$("#permission-look-username").val(data.data.username);
+
+						$("#permission-look-userPhone").val(data.data.userPhone);
+						$("#permission-look-nickName").val(data.data.nickName);
+						if(data.data.schoolId != null && data.data.schoolId != '') {
+							$("#selectSchool").val(data.data.schoolId);
+						}
+						form.on('select(schoolChoose)', function(data) {
+							var provinceId = $(data.elem).find("option:selected").attr("provinceId");
+							$("#selectArea").val(provinceId);
+							form.render('select');
+
+						});
+						form.render('select');
+					
+						var provinceId = $("#selectSchool").find("option:selected").attr("provinceId");
+						$("#selectArea").val(provinceId);
+						form.render('select');
+
+						if(data.data.status == true) {
+							$("#permission-look-status").val("禁用");
+						} else {
+							$("#permission-look-status").val("启用");
+						}
+
+						renderTable(table, data.data.roles);
+					} else {
+						layer.msg('发生错误啦...');
+
+					}
+				});
+			});
+		}
+	</script>
+
+	<script>
+		function renderTable(table, data) {
+			var roleTable = table.render({
+				elem: '#test',
+				toolbar: '#toolbarDemo',
+				title: '角色表',
+				totalRow: true,
+				cols: [
+					[{
+						type: 'checkbox',
+						fixed: 'left'
+					}, {
+						field: 'id',
+						title: 'ID',
+						width: 80,
+						fixed: 'left',
+						unresize: true,
+						sort: true
+
+					}, {
+						field: 'roleName',
+						title: '角色名称',
+						width: 120,
+						edit: 'text'
+					}, {
+						field: 'createUserId',
+						title: '创建人ID',
+						width: 150,
+						edit: 'text',
+						templet: function(d) {
+							if(d.createUserId == null) {
+								return '--'
+							}
+							return d.createUserId
+						}
+					}, {
+						field: 'createUserName',
+						title: '创建人名称',
+						sort: true,
+						templet: function(d) {
+							if(d.createUserName == null) {
+								return '--'
+							}
+							return d.createUserName
+						}
+					}, {
+						field: 'modifyUserId',
+						title: '修改人ID',
+						edit: 'text',
+						sort: true,
+						templet: function(d) {
+							if(d.modifyUserId == null) {
+								return '--'
+							}
+							return d.modifyUserId
+						}
+					}, {
+						field: 'modifyUserName',
+						title: '修改人名称',
+						width: 150,
+						sort: true,
+						templet: function(d) {
+							if(d.modifyUserName == null) {
+								return '--'
+							}
+							return d.modifyUserName
+						}
+					}, {
+						field: 'createDate',
+						title: '创建日期',
+						templet: function(d) {
+							if(d.createDate == null) {
+								return '--'
+							}
+							return timeStampToDate(d.createDate)
+						}
+					}, {
+						field: 'modifyDate',
+						title: '修改日期',
+						templet: function(d) {
+							if(d.modifyDate == null) {
+								return '--'
+							}
+							return timeStampToDate(d.modifyDate)
+						}
+					}, {
+						field: 'status',
+						title: '角色状态',
+						width: 120,
+						templet: function(d) {
+							if(d.status == 0) {
+								return '启用'
+							}
+							return '禁用'
+						}
+					}]
+				],
+				data: data,
+				page: true
+			});
+
+			return roleTable;
+
+		}
+	</script>
+
+	<script id="selectSchoolTmpl" type="text/x-jquery-tmpl">
+		{{each(i,itemData) schoolData}}
+		<option id="school-${itemData.coid}" value="${itemData.coid}" provinceId="${itemData.provinceid}">${itemData.name}</option>
+		{{/each}}
+
+	</script>
+
+	<script id="selectAreaTmpl" type="text/x-jquery-tmpl">
+		{{each(i,itemData) areaData}}
+		<option id="area-${itemData.id}" value="${itemData.id}">${itemData.areaname}</option>
+		{{/each}}
+	</script>
+
+</html>
